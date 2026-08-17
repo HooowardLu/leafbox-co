@@ -1,0 +1,14 @@
+# 编译产物
+*.o
+*.out
+/build/
+*.exe
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# 依赖
+node_modules/
+vendor/
