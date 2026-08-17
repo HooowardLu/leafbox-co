@@ -2,6 +2,9 @@
 #define __CO_H__
 
 #include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+#include <iostream>
 
 enum {
     CO_R15 = 0,
@@ -25,17 +28,25 @@ struct co_context {
 
 typedef void (*start_coroutine)();
 
-struct coroutine {
-    struct co_context ctx;
-    char *stack;
-    size_t stack_size;
-    start_coroutine start;
+class Co {
+public:
+    struct co_context ctx_;
+    Co(std::string name, start_coroutine start_fn);
+    ~Co();
+private:
+    std::string name_;
+    char *stack_;
+    int stack_size_;
+    start_coroutine start_;
+    void makeContext(void);
 };
 
 
-void co_ctx_swap(struct co_context *curr, struct co_context *next);
+// void co_ctx_swap(struct co_context *curr, struct co_context *next);
 struct coroutine *co_new(start_coroutine start, size_t stack_size);
 void co_free(struct coroutine *co);
 void co_ctx_make(struct coroutine *co);
-
+extern "C" {
+    void co_ctx_swap(struct co_context *curr, struct co_context *next);
+}
 #endif // __CO_H__
