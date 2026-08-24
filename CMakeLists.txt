@@ -42,7 +42,7 @@ set(COMMON_SOURCES
 include_directories(${CMAKE_SOURCE_DIR})
 
 # ========== 生成可执行文件 ==========
-add_executable(test1 ${ASM_SOURCES} ${COMMON_SOURCES} test1.cc)
+add_executable(test1 ${ASM_SOURCES} ${COMMON_SOURCES} test/test1.cc)
 
 # ========== 保持与原 Makefile 严格一致 ==========
 # 原 Makefile 中 x64 的 CC=g++，意味着 test1.c 实际按 C++ 编译
