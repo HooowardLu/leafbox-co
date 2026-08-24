@@ -33,7 +33,10 @@ else()
     message(FATAL_ERROR "Unknown ARCH '${ARCH}'. Expected: x64 or arm64")
 endif()
 
-set(COMMON_SOURCES coro/co.cc)
+set(COMMON_SOURCES 
+    coro/co.cc
+    sched/sched.cc
+)
 
 # ========== 头文件搜索路径 (-I.) ==========
 include_directories(${CMAKE_SOURCE_DIR})

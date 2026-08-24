@@ -31,6 +31,7 @@ typedef void (*start_coroutine)();
 class Co {
 public:
     struct co_context ctx_;
+    std::string& getName();
     Co(std::string name, start_coroutine start_fn);
     ~Co();
 private:

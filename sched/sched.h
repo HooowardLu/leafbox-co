@@ -1,10 +1,31 @@
 #ifndef __SCHED_H__
 #define __SCHED_H__
 
-extern int g_co_nr;
-extern struct coroutine* g_co_list[];
+#include <vector>
+#include <cstddef>
+#include "coro/co.h"
 
-void sched_add(struct coroutine* co);
-void sched_yield(struct coroutine* co);
+class SchedManager {
+public:
+    static SchedManager& getInstance();
+
+    SchedManager(const SchedManager&) = delete;
+    SchedManager& operator=(const SchedManager&) = delete;
+
+    void addCo(Co* co);
+    void removeCo(Co* co);
+
+    Co* getCo(size_t index);
+    size_t getCoCount() const;
+
+    void schedule();
+    void printAllCo();
+
+private:
+    SchedManager() = default;
+    ~SchedManager() = default;
+
+    std::vector<Co*> co_list_;
+};
 
 #endif

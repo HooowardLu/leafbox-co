@@ -1,5 +1,6 @@
 #include <iostream>
 #include "coro/co.h"
+#include "sched/sched.h"
 
 Co *ma, *a;
 
@@ -15,6 +16,7 @@ int main(int argc, char *argv[]) {
     ma = new Co("main", NULL);
     a = new Co("a", foo);
 
+    SchedManager::getInstance().printAllCo();
     co_ctx_swap(&ma->ctx_, &a->ctx_);
     printf("main coroutine here\n");
     co_ctx_swap(&ma->ctx_, &a->ctx_);
