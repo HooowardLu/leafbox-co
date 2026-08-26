@@ -5,9 +5,13 @@
 #include <cstddef>
 #include "coro/co.h"
 
+namespace Sched {
+
 class SchedManager {
 public:
+    static Co* Current;
     static SchedManager& getInstance();
+    static void Yield();
 
     SchedManager(const SchedManager&) = delete;
     SchedManager& operator=(const SchedManager&) = delete;
@@ -18,7 +22,6 @@ public:
     Co* getCo(size_t index);
     size_t getCoCount() const;
 
-    void schedule();
     void printAllCo();
 
 private:
@@ -27,5 +30,8 @@ private:
 
     std::vector<Co*> co_list_;
 };
+
+
+}
 
 #endif

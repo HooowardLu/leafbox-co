@@ -10,9 +10,11 @@ Co::Co(std::string name, start_coroutine start_fn) {
     stack_size_ = 1024 * 1024;
     stack_ = (char *)malloc(stack_size_);
     start_ = start_fn;
-    //if (name_ != "main")
     makeContext();
-    SchedManager::getInstance().addCo(this);
+    Sched::SchedManager::getInstance().addCo(this);
+    if (name_ == "main") {
+        Sched::SchedManager::Current = this;
+    }
 }
 
 Co::~Co() {

@@ -3,6 +3,10 @@
 #include "coro/co.h"
 #include "sched/sched.h"
 
+using namespace Sched;
+
+Co* Sched::SchedManager::Current = nullptr;
+
 SchedManager& SchedManager::getInstance() {
     static SchedManager instance;
     return instance;
@@ -30,8 +34,14 @@ size_t SchedManager::getCoCount() const {
     return co_list_.size();
 }
 
-void SchedManager::schedule() {
-    for (auto* co : co_list_) {
+void SchedManager::Yield() {
+    Co *oldCurrent = Current;
+
+    for (auto* co : SchedManager::getInstance().co_list_) {
+        if (co != Current) {
+            Current = co;
+            co_ctx_swap(&oldCurrent->ctx_, &Current->ctx_);
+        }
     }
 }
 
