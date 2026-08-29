@@ -4,24 +4,40 @@
 
 using namespace Sched;
 
-Co *ma, *a;
+void foo_c(void) {
+    std::cout << "===>[Co c] hello" << std::endl;
+    Scheduler::Yield();
+    std::cout << "===>[Co c] resumed" << std::endl;
+    Scheduler::Return();
+}
 
-void foo(void) {
-    std::cout << "===> hello" << std::endl;
-    SchedManager::Yield();
-    std::cout << "===> resumed" << std::endl;
-    SchedManager::Yield();
+void foo_a(void) {
+    Co *c = new Co("c", foo_c);
+
+    std::cout << "===>[Co a] hello" << std::endl;
+    Scheduler::Yield();
+    std::cout << "===>[Co a] resumed" << std::endl;
+    Scheduler::Return();
+}
+
+void foo_b(void) {
+    std::cout << "===>[Co b] hello1" << std::endl;
+    Scheduler::Yield();
+    std::cout << "===>[Co b] resumed2" << std::endl;
+    Scheduler::Yield();
+    std::cout << "===>[Co b] resumed3" << std::endl;
+    Scheduler::Yield();
+    std::cout << "===>[Co b] resumed4" << std::endl;
+    Scheduler::Return();
 }
 
 int main(int argc, char *argv[]) {
-    ma = new Co("main", NULL);
-    a = new Co("a", foo);
+    Co *root, *a, *b;
+    root = new Co("root", NULL);
+    a = new Co("a", foo_a);
+    b = new Co("b", foo_b);
 
-    SchedManager::getInstance().printAllCo();
-    SchedManager::Yield();
-    printf("main coroutine here\n");
-    SchedManager::Yield();
-    printf("main coroutine finish\n");
-
+    Scheduler::getInstance().printAllCo();
+    Scheduler::SchedInit();
     return 0;
 }

@@ -11,14 +11,18 @@ Co::Co(std::string name, start_coroutine start_fn) {
     stack_ = (char *)malloc(stack_size_);
     start_ = start_fn;
     makeContext();
-    Sched::SchedManager::getInstance().addCo(this);
-    if (name_ == "main") {
-        Sched::SchedManager::Current = this;
+    Sched::Scheduler::getInstance().addCo(this);
+    if (name_ == "root") {
+        Sched::Scheduler::Current = this;
     }
 }
 
 Co::~Co() {
     free(stack_);
+}
+
+CoStatus& Co::getStatus() {
+    return status_;
 }
 
 std::string& Co::getName() {

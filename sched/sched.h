@@ -4,29 +4,33 @@
 #include <vector>
 #include <cstddef>
 #include "coro/co.h"
+#include <string>
 
 namespace Sched {
 
-class SchedManager {
+class Scheduler {
 public:
     static Co* Current;
-    static SchedManager& getInstance();
+    static Scheduler& getInstance();
     static void Yield();
+    static void Return();
+    static void SchedInit();
 
-    SchedManager(const SchedManager&) = delete;
-    SchedManager& operator=(const SchedManager&) = delete;
-
+    Scheduler(const Scheduler&) = delete;
+    Scheduler& operator=(const Scheduler&) = delete;
+    
     void addCo(Co* co);
+    std::vector<Co*>& getCoList();
     void removeCo(Co* co);
 
-    Co* getCo(size_t index);
+    Co* getCo(const std::string &name);
     size_t getCoCount() const;
 
     void printAllCo();
 
 private:
-    SchedManager() = default;
-    ~SchedManager() = default;
+    Scheduler() = default;
+    ~Scheduler() = default;
 
     std::vector<Co*> co_list_;
 };

@@ -26,12 +26,20 @@ struct co_context {
     void *regs[13];
 };
 
+enum CoStatus {
+    CO_READY,
+    CO_RUNNING,
+    CO_SUSPEND,
+    CO_DEAD
+};
+
 typedef void (*start_coroutine)();
 
 class Co {
 public:
     struct co_context ctx_;
     std::string& getName();
+    CoStatus& getStatus();
     Co(std::string name, start_coroutine start_fn);
     ~Co();
 private:
@@ -39,6 +47,7 @@ private:
     char *stack_;
     int stack_size_;
     start_coroutine start_;
+    CoStatus status_;
     void makeContext(void);
 };
 
