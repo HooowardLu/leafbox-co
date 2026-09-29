@@ -12,9 +12,11 @@ class Scheduler {
 public:
     static Co* Current;
     static Scheduler& getInstance();
-    static void Yield();
-    static void Return();
-    static void SchedInit();
+    static void yieldCo();
+    static void returnCo();
+    static void wakeupCo(Co *c);
+    static void schedInit();
+    inline static std::vector<Co*> co_list_;
 
     Scheduler(const Scheduler&) = delete;
     Scheduler& operator=(const Scheduler&) = delete;
@@ -31,8 +33,6 @@ public:
 private:
     Scheduler() = default;
     ~Scheduler() = default;
-
-    std::vector<Co*> co_list_;
 };
 
 

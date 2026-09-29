@@ -1,8 +1,9 @@
-#include <algorithm>
+#include <unistd.h>
 #include <iostream>
+#include <algorithm>
 #include "coro/co.h"
 #include "sched/sched.h"
-#include <unistd.h>
+
 
 using namespace Sched;
 
@@ -13,15 +14,15 @@ Scheduler& Scheduler::getInstance() {
     return instance;
 }
 
-void Scheduler::SchedInit() {
-    std::cout<< "SchedInit" << std::endl;
+void Scheduler::schedInit() {
+    std::cout<< "schedInit" << std::endl;
     while(1) {
         if (Scheduler::getInstance().getCoCount() == 1 && 
             Scheduler::getInstance().getCoList()[0]->getName() == "root") {
             std::cout << "idle..." << std::endl;
             sleep(1);
         }
-        Scheduler::Yield(); // re-schedule to other coroutines
+        Scheduler::yieldCo(); // re-schedule to other coroutines
     }
     std::cout<< "Exit..." << std::endl;
 }
@@ -54,7 +55,7 @@ std::vector<Co*>& Scheduler::getCoList() {
     return co_list_;
 }
 
-void Scheduler::Yield() {
+void Scheduler::yieldCo() {
     Co *oldCurrent = Current;
     std::vector<Co*>& co_list = Scheduler::getInstance().getCoList();
 
@@ -75,7 +76,7 @@ void Scheduler::Yield() {
     }
 }
 
-void Scheduler::Return() {
+void Scheduler::returnCo() {
     Co *oldCurrent = Current;
 
     oldCurrent->getStatus() = CO_DEAD;
@@ -86,6 +87,13 @@ void Scheduler::Return() {
             co_ctx_swap(&oldCurrent->ctx_, &Current->ctx_);
         }
     }
+}
+
+void Scheduler::wakeupCo(Co *c) {
+    Co *oldCurrent = Current;
+    oldCurrent->getStatus() = CO_DEAD;
+    Current = c;
+    co_ctx_swap(&oldCurrent->ctx_, &Current->ctx_);
 }
 
 void Scheduler::printAllCo() {
