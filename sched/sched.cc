@@ -18,7 +18,7 @@ void Scheduler::schedInit() {
     std::cout<< "schedInit" << std::endl;
     while(1) {
         if (Scheduler::getInstance().getCoCount() == 1 && 
-            Scheduler::getInstance().getCoList()[0]->getName() == "root") {
+            Scheduler::getInstance().getCoList()[0]->getName() == "idle") {
             std::cout << "idle..." << std::endl;
             sleep(1);
         }

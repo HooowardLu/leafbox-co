@@ -4,7 +4,7 @@
 
 using namespace Sched;
 
-Co *root, *a, *b;
+Co *idle, *a, *b;
 
 void foo_c(void) {
     std::cout << "===>[Co c] hello" << std::endl;
@@ -34,7 +34,7 @@ void foo_b(void) {
 }
 
 int main(int argc, char *argv[]) {
-    root = new Co("root", NULL);
+    idle = new Co("idle", NULL);
     a = new Co("a", foo_a);
     b = new Co("b", foo_b);
 

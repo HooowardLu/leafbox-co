@@ -35,6 +35,7 @@ endif()
 
 set(COMMON_SOURCES 
     coro/co.cc
+    coro/idle.cc
     sched/sched.cc
 )
 

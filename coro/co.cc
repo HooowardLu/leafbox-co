@@ -12,7 +12,7 @@ Co::Co(std::string name, start_coroutine start_fn) {
     start_ = start_fn;
     makeContext();
     Sched::Scheduler::getInstance().addCo(this);
-    if (name_ == "root") {
+    if (name_ == "idle") {
         Sched::Scheduler::Current = this;
     }
 }
