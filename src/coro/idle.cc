@@ -1,5 +1,6 @@
 #include <iostream>
 #include <unistd.h>
+#include <spdlog/spdlog.h>
 #include "coro/co.h"
 #include "sched/sched.h"
 
@@ -10,9 +11,15 @@ Co *idle = new Co("idle", NULL);
 
 void idleRoutineInvoke() {
     while(1) {
-        std::cout << "===>[idle] sleep1" << std::endl;
+        spdlog::info("===>[idle] sleep1");
         sleep(1);
-        std::cout << "===>[idle] ReScheduling..." << std::endl;
+        spdlog::info("===>[idle] ReScheduling...");
         scheduler.yieldCo(); // re-schedule to other coroutines
+
+        if (scheduler.getCoCount() == 1 &&
+            scheduler.getCoList()[0]->getName() == "idle") {
+            spdlog::info("===>[idle] No other coroutines");
+            break;
+        }
     }
 }
