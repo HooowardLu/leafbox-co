@@ -218,6 +218,11 @@ cmake --build build
 - You need to link the library and include the public headers in your own project.
 - If you cross-compile for ARM64, set `-DARCH=arm64` when configuring CMake.
 
+## Build CMD
+```
+cmake -B build -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_C_COMPILER=/usr/bin/gcc
+```
+
 ## License
 
 This project is licensed under the MIT license. See the `LICENSE` file for details.

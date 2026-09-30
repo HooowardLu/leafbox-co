@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <spdlog/spdlog.h>
 #include "coro/co.h"
 #include "coro/idle.h"
 #include "sched/sched.h"
@@ -74,7 +75,7 @@ void Scheduler::yieldCo() {
             Current = co;
             printAllCo();
 
-            std::cout << "($yield) " << oldCurrent->getName() << " => " << Current->getName() << std::endl;
+            spdlog::info("($yield) {} => {}", oldCurrent->getName(), Current->getName());
             Current->getStatus() = Co::CO_RUNNING;
             oldCurrent->getStatus() = Co::CO_PENDING;
             /* in the first yield in main function, idle context will be overlayed by the main function stack */
