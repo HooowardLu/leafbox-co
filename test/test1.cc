@@ -26,10 +26,10 @@ void foo_b(void) {
     std::cout << "===>[Co b] hello1" << std::endl;
     scheduler.yieldCo();
     std::cout << "===>[Co b] resumed2" << std::endl;
-    // scheduler.wakeupCo(a);
-    std::cout << "===>[Co b] resumed3" << std::endl;
-    scheduler.yieldCo();
-    std::cout << "===>[Co b] resumed4" << std::endl;
+    // // scheduler.wakeupCo(a);
+    // std::cout << "===>[Co b] resumed3" << std::endl;
+    // scheduler.yieldCo();
+    // std::cout << "===>[Co b] resumed4" << std::endl;
     scheduler.returnCo();
 }
 

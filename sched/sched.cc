@@ -20,7 +20,7 @@ void Scheduler::schedStart() {
     std::cout<< "schedStart" << std::endl;
     while(1) {
         idleRoutineInvoke();
-        std::cout << "ReScheduling..." << std::endl;
+        std::cout << "===>[idle] ReScheduling..." << std::endl;
         Scheduler::yieldCo(); // re-schedule to other coroutines
     }
     std::cout<< "Exit..." << std::endl;
