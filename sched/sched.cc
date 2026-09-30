@@ -18,20 +18,18 @@ namespace Sched {
 
 void Scheduler::schedStart() {
     std::cout<< "schedStart" << std::endl;
-    scheduler.Current = scheduler.getCo("idle");
-    while(1) {
-        idleRoutineInvoke();
-        std::cout << "===>[main idle] ReScheduling..." << std::endl;
-        Scheduler::yieldCo(); // re-schedule to other coroutines
-    }
+    scheduler.Current = scheduler.getCo("idle"); // One will be the idle if it is set to the first Current.
+    scheduler.Current->getStatus() = Co::CO_RUNNING;
+    idleRoutineInvoke();
     std::cout<< "Exit..." << std::endl;
 }
 
 void Scheduler::addCo(Co* co) {
+    co->getStatus() = Co::CO_READY;
     co_list_.push_back(co);
 }
 
-void Scheduler::removeCo(Co* co) {
+void Scheduler::deleteCo(Co* co) {
     auto it = std::find(co_list_.begin(), co_list_.end(), co);
     if (it != co_list_.end()) {
         co_list_.erase(it);
@@ -65,27 +63,31 @@ void Scheduler::yieldCo() {
      */
     co_list.erase(std::remove_if(co_list.begin(), co_list.end(),
         [](Co* co) {
-            if (co->getStatus() == CO_DEAD) {
+            if (co->getStatus() == Co::CO_DEAD) {
                 std::cout << "Removing dead coroutine: " << co->getName() << std::endl; 
             }
-            return co->getStatus() == CO_DEAD; }),
+            return co->getStatus() == Co::CO_DEAD; }),
         co_list.end());
 
     for (auto* co : scheduler.getCoList()) {
         if (co != Current) {
             Current = co;
-            std::cout << "($yield) " << oldCurrent->getName() << " => " << Current->getName() << std::endl;
             printAllCo();
-            co_ctx_swap(&oldCurrent->ctx_, &Current->ctx_);
+
+            std::cout << "($yield) " << oldCurrent->getName() << " => " << Current->getName() << std::endl;
+            Current->getStatus() = Co::CO_RUNNING;
+            oldCurrent->getStatus() = Co::CO_PENDING;
+            /* in the first yield in main function, idle context will be overlayed by the main function stack */
+            co_ctx_swap(&oldCurrent->ctx_, &Current->ctx_); /* if a Co is swap back, it will continue from here. */
         }
     }
-    std::cout << "($yield) " << oldCurrent->getName() << " => " << Current->getName() << std::endl;
+    // std::cout << "($yield) " << oldCurrent->getName() << " => " << Current->getName() << std::endl;
 }
 
 void Scheduler::returnCo() {
     Co *oldCurrent = Current;
 
-    oldCurrent->getStatus() = CO_DEAD;
+    oldCurrent->getStatus() = Co::CO_DEAD;
     std::cout << oldCurrent->getName() << " => " << "DEAD" << std::endl;
 
     for (auto &co : scheduler.getCoList()) {
@@ -96,17 +98,18 @@ void Scheduler::returnCo() {
     }
 }
 
-void Scheduler::wakeupCo(Co *c) {
+void Scheduler::wakeupCo(const std::string &name) {
     Co *oldCurrent = Current;
-    oldCurrent->getStatus() = CO_DEAD;
-    Current = c;
+    oldCurrent->getStatus() = Co::CO_DEAD;
+
+    Current = getCo(name);
     co_ctx_swap(&oldCurrent->ctx_, &Current->ctx_);
 }
 
 void Scheduler::printAllCo() {
     std::cout << "================All coroutines================" << std::endl;
     for (size_t i = 0; i < co_list_.size(); ++i) {
-        std::cout << "Co " << i << ": " << co_list_[i]->getName() << std::endl;
+        std::cout << co_list_[i]->getName() << "\t " << Co::CoStatusDecode[co_list_[i]->getStatus()] << std::endl;
     }
     std::cout << "==============================================" << std::endl;
 }

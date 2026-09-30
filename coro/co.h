@@ -1,9 +1,10 @@
 #pragma once
 
+#include <iostream>
 #include <stddef.h>
 #include <stdint.h>
-#include <string.h>
-#include <iostream>
+#include <string>
+#include <vector>
 
 enum {
     CO_R15 = 0,
@@ -25,17 +26,23 @@ struct co_context {
     void *regs[13];
 };
 
-enum CoStatus {
-    CO_READY,
-    CO_RUNNING,
-    CO_SUSPEND,
-    CO_DEAD
-};
-
 typedef void (*CoroutineFunction)();
 
 class Co {
 public:
+    enum CoStatus {
+        CO_READY,
+        CO_RUNNING,
+        CO_PENDING,
+        CO_DEAD
+    };
+
+    inline static std::vector<std::string> CoStatusDecode = {
+        "CO_READY",
+        "CO_RUNNING",
+        "CO_PENDING",
+        "CO_DEAD"
+    };
     struct co_context ctx_;
     std::string& getName();
     CoStatus& getStatus();

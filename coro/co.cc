@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
-#include <string.h>
+#include <string>
+#include <vector>
 #include "coro/co.h"
 #include "sched/sched.h"
 
@@ -19,7 +20,7 @@ Co::~Co() {
     free(stack_);
 }
 
-CoStatus& Co::getStatus() {
+Co::CoStatus& Co::getStatus() {
     return status_;
 }
 

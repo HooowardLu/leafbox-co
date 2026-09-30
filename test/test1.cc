@@ -12,9 +12,6 @@ void foo_idle() {
     }
 }
 
-Co *a, *b;
-Co *idle = new Co("idle", foo_idle);
-
 void foo_c(void) {
     std::cout << "===>[Co c] hello" << std::endl;
     scheduler.yieldCo();
@@ -23,7 +20,7 @@ void foo_c(void) {
 }
 
 void foo_a(void) {
-    // Co *c = new Co("c", foo_c);
+    Co *c = new Co("c", foo_c);
 
     std::cout << "===>[Co a] hello" << std::endl;
     scheduler.yieldCo();
@@ -35,16 +32,19 @@ void foo_b(void) {
     std::cout << "===>[Co b] hello1" << std::endl;
     scheduler.yieldCo();
     std::cout << "===>[Co b] resumed2" << std::endl;
-    // // scheduler.wakeupCo(a);
-    // std::cout << "===>[Co b] resumed3" << std::endl;
-    // scheduler.yieldCo();
-    // std::cout << "===>[Co b] resumed4" << std::endl;
+    scheduler.wakeupCo("a");
+    std::cout << "===>[Co b] resumed3" << std::endl;
+    scheduler.yieldCo();
+    std::cout << "===>[Co b] resumed4" << std::endl;
     scheduler.returnCo();
 }
 
+
+
+
 int main(int argc, char *argv[]) {
-    a = new Co("a", foo_a);
-    b = new Co("b", foo_b);
+    Co *a = new Co("a", foo_a);
+    Co *b = new Co("b", foo_b);
 
     scheduler.printAllCo();
     scheduler.schedStart();

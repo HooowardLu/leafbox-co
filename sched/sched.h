@@ -18,12 +18,12 @@ public:
     
     void addCo(Co* co);
     std::vector<Co*>& getCoList();
-    void removeCo(Co* co);
+    void deleteCo(Co* co);
     Co* getCo(const std::string &name);
     size_t getCoCount() const;
     void yieldCo();
     void returnCo();
-    void wakeupCo(Co *c);
+    void wakeupCo(const std::string &name);
     void schedStart();
 
     void printAllCo();
