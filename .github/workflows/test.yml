@@ -1,0 +1,50 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DARCH=x64
+
+      - name: Build static library
+        run: cmake --build build --config Release -j"$(nproc)"
+
+      - name: Prepare release package
+        run: |
+          mkdir -p release/lib release/include
+          cp build/libuco.a release/lib/
+          cp -r include/* release/include/
+          tar -czf uco-x64-linux.tar.gz -C release .
+          ls -R release
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: main-${{ github.run_number }}
+          name: Uco build ${{ github.run_number }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            build/libuco.a
+            uco-x64-linux.tar.gz
