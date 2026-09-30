@@ -10,12 +10,8 @@ namespace Sched {
 
 class Scheduler {
 public:
-    static Co* Current;
+    inline static Co* Current = nullptr;
     static Scheduler& getInstance();
-    static void yieldCo();
-    static void returnCo();
-    static void wakeupCo(Co *c);
-    static void schedInit();
     inline static std::vector<Co*> co_list_;
 
     Scheduler(const Scheduler&) = delete;
@@ -24,9 +20,12 @@ public:
     void addCo(Co* co);
     std::vector<Co*>& getCoList();
     void removeCo(Co* co);
-
     Co* getCo(const std::string &name);
     size_t getCoCount() const;
+    void yieldCo();
+    void returnCo();
+    void wakeupCo(Co *c);
+    void schedStart();
 
     void printAllCo();
 
@@ -35,6 +34,7 @@ private:
     ~Scheduler() = default;
 };
 
+    extern Scheduler& scheduler;
 
 }
 

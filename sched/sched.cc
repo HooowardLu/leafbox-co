@@ -7,15 +7,17 @@
 
 using namespace Sched;
 
-Co* Sched::Scheduler::Current = nullptr;
-
 Scheduler& Scheduler::getInstance() {
-    static Scheduler instance;
-    return instance;
+    static Scheduler SchedulerInstance;
+    return SchedulerInstance;
 }
 
-void Scheduler::schedInit() {
-    std::cout<< "schedInit" << std::endl;
+namespace Sched {
+    Scheduler& scheduler = Scheduler::getInstance();
+}
+
+void Scheduler::schedStart() {
+    std::cout<< "schedStart" << std::endl;
     while(1) {
         if (Scheduler::getInstance().getCoCount() == 1 && 
             Scheduler::getInstance().getCoList()[0]->getName() == "idle") {
