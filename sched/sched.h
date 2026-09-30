@@ -1,5 +1,4 @@
-#ifndef __SCHED_H__
-#define __SCHED_H__
+#pragma once
 
 #include <vector>
 #include <cstddef>
@@ -37,5 +36,3 @@ private:
     extern Scheduler& scheduler;
 
 }
-
-#endif

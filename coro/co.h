@@ -1,5 +1,4 @@
-#ifndef __CO_H__
-#define __CO_H__
+#pragma once
 
 #include <stddef.h>
 #include <stdint.h>
@@ -59,4 +58,3 @@ void co_ctx_make(struct coroutine *co);
 extern "C" {
     void co_ctx_swap(struct co_context *curr, struct co_context *next);
 }
-#endif // __CO_H__
