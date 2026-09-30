@@ -33,27 +33,27 @@ enum CoStatus {
     CO_DEAD
 };
 
-typedef void (*start_coroutine)();
+typedef void (*CoroutineFunction)();
 
 class Co {
 public:
     struct co_context ctx_;
     std::string& getName();
     CoStatus& getStatus();
-    Co(std::string name, start_coroutine start_fn);
+    Co(std::string name, CoroutineFunction co_fn);
     ~Co();
 private:
     std::string name_;
     char *stack_;
     int stack_size_;
-    start_coroutine start_;
+    CoroutineFunction co_fn_;
     CoStatus status_;
     void makeContext(void);
 };
 
 
 // void co_ctx_swap(struct co_context *curr, struct co_context *next);
-struct coroutine *co_new(start_coroutine start, size_t stack_size);
+struct coroutine *co_new(CoroutineFunction start, size_t stack_size);
 void co_free(struct coroutine *co);
 void co_ctx_make(struct coroutine *co);
 extern "C" {

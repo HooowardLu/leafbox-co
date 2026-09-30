@@ -1,7 +1,7 @@
-#include <unistd.h>
 #include <iostream>
 #include <algorithm>
 #include "coro/co.h"
+#include "coro/idle.h"
 #include "sched/sched.h"
 
 
@@ -19,11 +19,8 @@ namespace Sched {
 void Scheduler::schedStart() {
     std::cout<< "schedStart" << std::endl;
     while(1) {
-        if (Scheduler::getInstance().getCoCount() == 1 && 
-            Scheduler::getInstance().getCoList()[0]->getName() == "idle") {
-            std::cout << "idle..." << std::endl;
-            sleep(1);
-        }
+        idleRoutineInvoke();
+        std::cout << "ReScheduling..." << std::endl;
         Scheduler::yieldCo(); // re-schedule to other coroutines
     }
     std::cout<< "Exit..." << std::endl;
@@ -61,7 +58,10 @@ void Scheduler::yieldCo() {
     Co *oldCurrent = Current;
     std::vector<Co*>& co_list = Scheduler::getInstance().getCoList();
 
-    //clean up dead coroutines
+    /* Need to clean up dead coroutines, 
+     * because if the Co is Returned, it will be marked as CO_DEAD, and we need to remove it from the list.
+     *  Otherwise, the scheduler will keep switching to the dead coroutine, which will cause a crash.
+     */
     co_list.erase(std::remove_if(co_list.begin(), co_list.end(),
         [](Co* co) {
             if (co->getStatus() == CO_DEAD) {
@@ -73,9 +73,11 @@ void Scheduler::yieldCo() {
     for (auto* co : Scheduler::getInstance().getCoList()) {
         if (co != Current) {
             Current = co;
+            std::cout << "($yield) " << oldCurrent->getName() << " => " << Current->getName() << std::endl;
             co_ctx_swap(&oldCurrent->ctx_, &Current->ctx_);
         }
     }
+    std::cout << "($yield) " << oldCurrent->getName() << " => " << Current->getName() << std::endl;
 }
 
 void Scheduler::returnCo() {

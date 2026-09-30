@@ -11,8 +11,8 @@ namespace Sched {
 class Scheduler {
 public:
     inline static Co* Current = nullptr;
-    static Scheduler& getInstance();
     inline static std::vector<Co*> co_list_;
+    static Scheduler& getInstance();
 
     Scheduler(const Scheduler&) = delete;
     Scheduler& operator=(const Scheduler&) = delete;

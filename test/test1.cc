@@ -26,7 +26,7 @@ void foo_b(void) {
     std::cout << "===>[Co b] hello1" << std::endl;
     scheduler.yieldCo();
     std::cout << "===>[Co b] resumed2" << std::endl;
-    scheduler.wakeupCo(a);
+    // scheduler.wakeupCo(a);
     std::cout << "===>[Co b] resumed3" << std::endl;
     scheduler.yieldCo();
     std::cout << "===>[Co b] resumed4" << std::endl;
@@ -35,7 +35,7 @@ void foo_b(void) {
 
 int main(int argc, char *argv[]) {
     idle = new Co("idle", NULL);
-    a = new Co("a", foo_a);
+    // a = new Co("a", foo_a);
     b = new Co("b", foo_b);
 
     scheduler.getInstance().printAllCo();
