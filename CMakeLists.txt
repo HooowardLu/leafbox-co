@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
-project(coroutine_test C CXX ASM)
+project(uco C CXX ASM)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # ========== 架构选择 ==========
 # 用法: cmake -B build -DARCH=x64
@@ -20,35 +24,41 @@ if(ARCH STREQUAL "arm64")
     set(CMAKE_CXX_COMPILER aarch64-none-linux-gnu-g++)
     set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -static")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
-    set(ASM_SOURCES arch/arm64/co.S)
-
+    set(ASM_SOURCES src/arch/arm64/co.S)
 elseif(ARCH STREQUAL "x64")
-    # 原 Makefile 用 g++ 编译所有文件，这里分离 C/C++ 编译器更规范
     set(CMAKE_C_COMPILER   gcc)
     set(CMAKE_CXX_COMPILER g++)
-    set(CMAKE_CXX_STANDARD 17)
-    set(ASM_SOURCES arch/x64/co.S)
-
+    set(ASM_SOURCES src/arch/x64/co.S)
 else()
     message(FATAL_ERROR "Unknown ARCH '${ARCH}'. Expected: x64 or arm64")
 endif()
 
-set(COMMON_SOURCES 
-    coro/co.cc
-    coro/idle.cc
-    sched/sched.cc
+set(COMMON_SOURCES
+    src/coro/co.cc
+    src/coro/idle.cc
+    src/sched/sched.cc
 )
 
-# ========== 头文件搜索路径 (-I.) ==========
-include_directories(${CMAKE_SOURCE_DIR})
+# ========== 头文件搜索路径 ==========
+include_directories(${CMAKE_SOURCE_DIR}/include)
 
-# ========== 生成可执行文件 ==========
-add_executable(test1 ${ASM_SOURCES} ${COMMON_SOURCES} test/test1.cc)
+# ========== 生成静态库 ==========
+add_library(uco STATIC ${ASM_SOURCES} ${COMMON_SOURCES})
 
-# ========== 保持与原 Makefile 严格一致 ==========
-# 原 Makefile 中 x64 的 CC=g++，意味着 test1.c 实际按 C++ 编译
-# 如果你需要完全还原这个行为，取消下面这行的注释：
-# set_source_files_properties(test1.c test2.c PROPERTIES LANGUAGE CXX)
+target_include_directories(uco
+    PUBLIC
+        ${CMAKE_SOURCE_DIR}/include
+)
 
+# ========== 生成测试可执行文件 ==========
+add_executable(test1 test/test1.cc)
+target_link_libraries(test1 PRIVATE uco)
+
+target_include_directories(test1
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}/include
+)
+
+# ========== 其它设置 ==========
 # 显式标记 .S 为汇编（CMake 3.20+ 通常自动识别，显式设置更保险）
 set_source_files_properties(${ASM_SOURCES} PROPERTIES LANGUAGE ASM)
