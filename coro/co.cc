@@ -4,6 +4,7 @@
 #include "coro/co.h"
 #include "sched/sched.h"
 
+using namespace Sched;
 
 Co::Co(std::string name, CoroutineFunction co_fn) {
     name_ = name;
@@ -11,10 +12,7 @@ Co::Co(std::string name, CoroutineFunction co_fn) {
     stack_ = (char *)malloc(stack_size_);
     co_fn_ = co_fn;
     makeContext();
-    Sched::Scheduler::getInstance().addCo(this);
-    if (name_ == "idle") {
-        Sched::Scheduler::Current = this;
-    }
+    scheduler.addCo(this);
 }
 
 Co::~Co() {

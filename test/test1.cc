@@ -4,7 +4,16 @@
 
 using namespace Sched;
 
-Co *idle, *a, *b;
+void foo_idle() {
+    while (true) {
+        std::cout << "===>[foo_idle] hello" << std::endl;
+        scheduler.yieldCo();
+        std::cout << "===>[foo_idle] resumed" << std::endl;
+    }
+}
+
+Co *a, *b;
+Co *idle = new Co("idle", foo_idle);
 
 void foo_c(void) {
     std::cout << "===>[Co c] hello" << std::endl;
@@ -14,7 +23,7 @@ void foo_c(void) {
 }
 
 void foo_a(void) {
-    Co *c = new Co("c", foo_c);
+    // Co *c = new Co("c", foo_c);
 
     std::cout << "===>[Co a] hello" << std::endl;
     scheduler.yieldCo();
@@ -34,11 +43,10 @@ void foo_b(void) {
 }
 
 int main(int argc, char *argv[]) {
-    idle = new Co("idle", NULL);
-    // a = new Co("a", foo_a);
+    a = new Co("a", foo_a);
     b = new Co("b", foo_b);
 
-    scheduler.getInstance().printAllCo();
+    scheduler.printAllCo();
     scheduler.schedStart();
     return 0;
 }

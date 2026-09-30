@@ -18,9 +18,10 @@ namespace Sched {
 
 void Scheduler::schedStart() {
     std::cout<< "schedStart" << std::endl;
+    scheduler.Current = scheduler.getCo("idle");
     while(1) {
         idleRoutineInvoke();
-        std::cout << "===>[idle] ReScheduling..." << std::endl;
+        std::cout << "===>[main idle] ReScheduling..." << std::endl;
         Scheduler::yieldCo(); // re-schedule to other coroutines
     }
     std::cout<< "Exit..." << std::endl;
@@ -56,7 +57,7 @@ std::vector<Co*>& Scheduler::getCoList() {
 
 void Scheduler::yieldCo() {
     Co *oldCurrent = Current;
-    std::vector<Co*>& co_list = Scheduler::getInstance().getCoList();
+    std::vector<Co*>& co_list = scheduler.getCoList();
 
     /* Need to clean up dead coroutines, 
      * because if the Co is Returned, it will be marked as CO_DEAD, and we need to remove it from the list.
@@ -70,10 +71,11 @@ void Scheduler::yieldCo() {
             return co->getStatus() == CO_DEAD; }),
         co_list.end());
 
-    for (auto* co : Scheduler::getInstance().getCoList()) {
+    for (auto* co : scheduler.getCoList()) {
         if (co != Current) {
             Current = co;
             std::cout << "($yield) " << oldCurrent->getName() << " => " << Current->getName() << std::endl;
+            printAllCo();
             co_ctx_swap(&oldCurrent->ctx_, &Current->ctx_);
         }
     }
@@ -84,8 +86,9 @@ void Scheduler::returnCo() {
     Co *oldCurrent = Current;
 
     oldCurrent->getStatus() = CO_DEAD;
+    std::cout << oldCurrent->getName() << " => " << "DEAD" << std::endl;
 
-    for (auto &co : Scheduler::getInstance().getCoList()) {
+    for (auto &co : scheduler.getCoList()) {
         if (co != Current) {
             Current = co;
             co_ctx_swap(&oldCurrent->ctx_, &Current->ctx_);
