@@ -11,14 +11,14 @@ Co *idle = new Co("idle", NULL);
 
 void idleRoutineInvoke() {
     while(1) {
-        spdlog::info("===>[idle] sleep1");
+        SPDLOG_INFO("===>[idle] sleep1");
         sleep(1);
-        spdlog::info("===>[idle] ReScheduling...");
+        SPDLOG_INFO("===>[idle] re-schedule...");
         scheduler.yieldCo(); // re-schedule to other coroutines
 
         if (scheduler.getCoCount() == 1 &&
             scheduler.getCoList()[0]->getName() == "idle") {
-            spdlog::info("===>[idle] No other coroutines");
+            SPDLOG_INFO("===>[idle] No other coroutines");
             break;
         }
     }

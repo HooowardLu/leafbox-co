@@ -1,3 +1,4 @@
+#include <spdlog/spdlog.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string>
@@ -14,6 +15,7 @@ Co::Co(std::string name, CoroutineFunction co_fn) {
     co_fn_ = co_fn;
     makeContext();
     scheduler.addCo(this);
+    SPDLOG_INFO("Coroutine created: {}", name_);
 }
 
 Co::~Co() {

@@ -1,4 +1,3 @@
-#include <iostream>
 #include <algorithm>
 #include <spdlog/spdlog.h>
 #include "coro/co.h"
@@ -18,11 +17,11 @@ namespace Sched {
 }
 
 void Scheduler::schedStart() {
-    std::cout<< "schedStart" << std::endl;
+    SPDLOG_INFO("schedStart");
     scheduler.Current = scheduler.getCo("idle"); // One will be the idle if it is set to the first Current.
     scheduler.Current->getStatus() = Co::CO_RUNNING;
     idleRoutineInvoke();
-    std::cout<< "Exit..." << std::endl;
+    SPDLOG_INFO("Exit...");
 }
 
 void Scheduler::addCo(Co* co) {
@@ -65,7 +64,7 @@ void Scheduler::yieldCo() {
     co_list.erase(std::remove_if(co_list.begin(), co_list.end(),
         [](Co* co) {
             if (co->getStatus() == Co::CO_DEAD) {
-                std::cout << "Removing dead coroutine: " << co->getName() << std::endl; 
+                SPDLOG_INFO("Removing dead coroutine: {}", co->getName());
             }
             return co->getStatus() == Co::CO_DEAD; }),
         co_list.end());
@@ -73,9 +72,9 @@ void Scheduler::yieldCo() {
     for (auto* co : scheduler.getCoList()) {
         if (co != Current) {
             Current = co;
-            printAllCo();
+            // printAllCo();
 
-            spdlog::info("($yield) {} => {}", oldCurrent->getName(), Current->getName());
+            SPDLOG_INFO("($yield) {} => {}", oldCurrent->getName(), Current->getName());
             Current->getStatus() = Co::CO_RUNNING;
             oldCurrent->getStatus() = Co::CO_PENDING;
             /* in the first yield in main function, idle context will be overlayed by the main function stack */
@@ -89,7 +88,7 @@ void Scheduler::returnCo() {
     Co *oldCurrent = Current;
 
     oldCurrent->getStatus() = Co::CO_DEAD;
-    std::cout << oldCurrent->getName() << " => " << "DEAD" << std::endl;
+    SPDLOG_INFO("{} => DEAD", oldCurrent->getName());
 
     for (auto &co : scheduler.getCoList()) {
         if (co != Current) {
@@ -108,9 +107,9 @@ void Scheduler::wakeupCo(const std::string &name) {
 }
 
 void Scheduler::printAllCo() {
-    std::cout << "================All coroutines================" << std::endl;
+    SPDLOG_INFO("================All coroutines================");
     for (size_t i = 0; i < co_list_.size(); ++i) {
-        std::cout << co_list_[i]->getName() << "\t " << Co::CoStatusDecode[co_list_[i]->getStatus()] << std::endl;
+        SPDLOG_INFO("{}\t {}", co_list_[i]->getName(), Co::CoStatusDecode[co_list_[i]->getStatus()]);
     }
-    std::cout << "==============================================" << std::endl;
+    SPDLOG_INFO("==============================================");
 }
